@@ -15,6 +15,7 @@ mod map;
 mod filter;
 mod filter_map;
 mod flatten;
+mod lazy;
 mod unions;
 mod recursive;
 mod shuffle;
