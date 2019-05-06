@@ -392,7 +392,7 @@ impl<T> LazyTupleUnion<T> {
 }
 
 macro_rules! tuple_union {
-    ($($gen:ident $ix:tt)*) => {
+    ($lazy_ident:ident: $($gen:ident $ix:tt)*) => {
         impl<A : Strategy, $($gen: Strategy<Value = A::Value>),*>
         Strategy for TupleUnion<(W<A>, $(W<$gen>),*)> {
             type Tree = TupleUnionValueTree<
@@ -416,6 +416,20 @@ macro_rules! tuple_union {
                     min_pick: 0,
                     prev_pick: None,
                 })
+            }
+        }
+
+        #[must_use = "strategies do nothing unless used"]
+        #[derive(Clone, Debug)]
+        pub struct $lazy_ident<A, $($gen),*> {
+            options: (W<Arc<A>>, $(W<Arc<$gen>>),*),
+        }
+
+        impl<A, $($gen),*> $lazy_ident<A, $($gen),*> {
+            pub fn new(tuple: (W<A>, $(W<$gen>),*)) -> Self {
+                let options = ((tuple.0).0, Arc::new((tuple.0).1),
+                               $((tuple.$ix).0, Arc::new((tuple.$ix).1)),*);
+                Self { options }
             }
         }
 
@@ -458,15 +472,15 @@ macro_rules! tuple_union {
     }
 }
 
-tuple_union!(B 1);
-tuple_union!(B 1 C 2);
-tuple_union!(B 1 C 2 D 3);
-tuple_union!(B 1 C 2 D 3 E 4);
-tuple_union!(B 1 C 2 D 3 E 4 F 5);
-tuple_union!(B 1 C 2 D 3 E 4 F 5 G 6);
-tuple_union!(B 1 C 2 D 3 E 4 F 5 G 6 H 7);
-tuple_union!(B 1 C 2 D 3 E 4 F 5 G 6 H 7 I 8);
-tuple_union!(B 1 C 2 D 3 E 4 F 5 G 6 H 7 I 8 J 9);
+tuple_union!(Lazy2TupleUnion: B 1);
+tuple_union!(Lazy3TupleUnion: B 1 C 2);
+tuple_union!(Lazy4TupleUnion: B 1 C 2 D 3);
+tuple_union!(Lazy5TupleUnion: B 1 C 2 D 3 E 4);
+tuple_union!(Lazy6TupleUnion: B 1 C 2 D 3 E 4 F 5);
+tuple_union!(Lazy7TupleUnion: B 1 C 2 D 3 E 4 F 5 G 6);
+tuple_union!(Lazy8TupleUnion: B 1 C 2 D 3 E 4 F 5 G 6 H 7);
+tuple_union!(Lazy9TupleUnion: B 1 C 2 D 3 E 4 F 5 G 6 H 7 I 8);
+tuple_union!(Lazy10TupleUnion: B 1 C 2 D 3 E 4 F 5 G 6 H 7 I 8 J 9);
 
 /// `ValueTree` type produced by `TupleUnion`.
 #[derive(Clone, Copy, Debug)]
