@@ -16,8 +16,10 @@ use crate::test_runner::*;
 /// Represents a value tree that is initialized on the first call to any
 /// methods.
 ///
-/// This is used to defer potentially expensive generation to shrinking time.
-pub(crate) struct LazyValueTree<S : Strategy> {
+/// This is an enum used to defer potentially expensive generation to
+/// shrinking time. It is public only to allow APIs to expose it as
+/// an intermediate value.
+pub struct LazyValueTree<S : Strategy> {
     state: LazyValueTreeState<S>,
 }
 
